@@ -77,25 +77,26 @@ public class PageRank {
 			pagerank = (1-d) + (d*pagerank);
 			
 			String value = pagerank + ", " + outLinks + ", " + inLinks;
-			//context.write(key, value);
 			countMap.put(new Text(key), new String(value));
 		}
 		
 		public void cleanup(Context context) throws IOException, InterruptedException {
-			List<Entry<Text, String>> countList = new ArrayList<Entry<Text, String>>(countMap.entrySet());
+			
+			
+			ArrayList<Entry<Text, String>> countList = new ArrayList<Entry<Text, String>>(countMap.entrySet());
 			Collections.sort(countList, new Comparator<Entry<Text, String>>(){
 				public int compare( Entry<Text, String> o1, Entry<Text, String> o2) {
 					String[] o1_parts = o1.getValue().split(",");
 					double o1_rank = Double.parseDouble(o1_parts[0]);
 					String[] o2_parts = o2.getValue().split(",");
 					double o2_rank = Double.parseDouble(o2_parts[0]);
-					
-					//throw new Exception("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + o1_rank + " ? " + o2_rank + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-					
-					return ((o2_rank > o1_rank) ? 1 : 0);
+
+					if (o1_rank == o2_rank)
+						return 0;
+					return (o1_rank > o2_rank) ? -1 : 1;
 				}
 			});
-			
+
 			int length = countList.size();
 			for (int i = 0; i < length && i < 500; i++)
 			{
